@@ -1,0 +1,2 @@
+addpath gui
+addpath model
