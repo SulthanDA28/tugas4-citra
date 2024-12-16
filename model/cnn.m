@@ -1,4 +1,4 @@
-function imageborder = cnn(image)
+function [imageborder,labelresult] = cnn(image)
     addpath model/pretrained-yolo-v4/
     addpath model/pretrained-yolo-v4/src/
     addpath model/pretrained-yolo-v4/models/
@@ -10,6 +10,24 @@ function imageborder = cnn(image)
     
 
     [boundingbox,score,label] = detectYOLOv4(net, image, anchor, classname, 'auto');
-
+    class = {'bus', 'car', 'truck'};
+    for j=1:length(label)
+        if(ismember(label(j),class))
+            continue
+        else
+            label(j) = 'other';
+        end
+    end
+    
     imageborder = insertObjectAnnotation(image,"rectangle",boundingbox,label);
+    
+    maxscore = score(1);
+    indexmax = 1;
+    for i=1:length(score)
+        if(maxscore < score(i))
+            maxscore = score(i);
+            indexmax = i;
+        end
+    end
+    labelresult = label(indexmax);
 end
